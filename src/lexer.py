@@ -35,7 +35,7 @@ token_specification = [
     ('KEYWORD',      r'\b(let|in|where|fn|rec|aug|or|not|gr|ge|ls|le|eq|ne|true|false|nil|dummy|within|and|isstring|isint|istuple|isfunction|isdummy|istruthvalue|order|null)\b'),
     ('IDENTIFIER',   r'[A-Za-z_][A-Za-z0-9_]*'),
     ('INTEGER',      r'\d+'),
-    ('STRING',       r"'(.*?)'"),
+    ('STRING',       r"'([^'\\]|\\[tn\\']|'''')*'"),
     ('OPERATOR',     r'[+\-*/<>&.@/:=~|$!#%^_\[\]{}"‘?\';]+'),
     ('PUNCTUATION',  r'[(),;]'),
 ]
