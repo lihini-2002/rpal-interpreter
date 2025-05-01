@@ -36,7 +36,7 @@ token_specification = [
     ('IDENTIFIER',   r'[A-Za-z_][A-Za-z0-9_]*'),
     ('INTEGER',      r'\d+'),
     ('STRING',       r"'(.*?)'"),
-    ('OPERATOR',     r'[\+\-\*/@=<>!]+'),
+    ('OPERATOR',     r'[+\-*/<>&.@/:=~|$!#%^_\[\]{}"‘?\';]+'),
     ('PUNCTUATION',  r'[(),;]'),
 ]
 
