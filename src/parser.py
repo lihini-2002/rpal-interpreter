@@ -285,7 +285,7 @@ class Parser:
 
             self.match(TokenType.OPERATOR, '=')
             self.parse_E()
-            build_tree('fcn_form', count + 1, self.stack)
+            build_tree('function_form', count + 1, self.stack)
 
         else:
             self.parse_Vl()
