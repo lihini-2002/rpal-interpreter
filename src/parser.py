@@ -186,4 +186,157 @@ class Parser:
             self.parse_R()
             build_tree('@', 3, self.stack)
     
-    
+    def parse_R(self):
+        self.parse_Rn()
+
+        while self.is_start_of_Rn():
+            self.parse_Rn()
+            build_tree('gamma', 2, self.stack)
+
+    def is_start_of_Rn(self):
+        token = self.peek()
+        if token is None:
+            return False
+
+        if token.type in {TokenType.IDENTIFIER, TokenType.INTEGER, TokenType.STRING}:
+            return True
+
+        if token.type == TokenType.KEYWORD and token.value in {'true', 'false', 'nil', 'dummy'}:
+            return True
+
+        if token.type == TokenType.PUNCTUATION and token.value == '(':
+            return True
+
+        return False
+
+    def parse_Rn(self):
+        token = self.peek()
+
+        if token.type == TokenType.PUNCTUATION and token.value == '(':
+            self.match(TokenType.PUNCTUATION, '(')
+            self.parse_E()
+            self.match(TokenType.PUNCTUATION, ')')
+
+        elif token.type == TokenType.IDENTIFIER:
+            token = self.match(TokenType.IDENTIFIER)
+            self.stack.append(ASTNode(f"<ID:{token.value}>"))
+
+        elif token.type == TokenType.INTEGER:
+            token = self.match(TokenType.INTEGER)
+            self.stack.append(ASTNode(f"<INT:{token.value}>"))
+
+        elif token.type == TokenType.STRING:
+            token = self.match(TokenType.STRING)
+            self.stack.append(ASTNode(f"<STR:{token.value}>"))
+
+        elif token.type == TokenType.KEYWORD and token.value in {'true', 'false', 'nil', 'dummy'}:
+            token = self.match(TokenType.KEYWORD)
+            self.stack.append(ASTNode(token.value))  # Use plain label like 'true', 'nil', etc.
+
+        else:
+            raise SyntaxError(f"Unexpected token in Rn: {token}")
+
+    def parse_D(self):
+        self.parse_Da()
+
+        if self.peek().type == TokenType.KEYWORD and self.peek().value == 'within':
+            self.match(TokenType.KEYWORD, 'within')
+            self.parse_D()
+            build_tree('within', 2, self.stack)
+
+    def parse_Da(self):
+        self.parse_Dr()
+        count = 1
+
+        while self.peek().type == TokenType.KEYWORD and self.peek().value == 'and':
+            self.match(TokenType.KEYWORD, 'and')
+            self.parse_Dr()
+            count += 1
+
+        if count > 1:
+            build_tree('and', count, self.stack)
+
+    def parse_Dr(self):
+        if self.peek().type == TokenType.KEYWORD and self.peek().value == 'rec':
+            self.match(TokenType.KEYWORD, 'rec')
+            self.parse_Db()
+            build_tree('rec', 1, self.stack)
+        else:
+            self.parse_Db()
+
+    def parse_Db(self):
+        if self.peek().type == TokenType.PUNCTUATION and self.peek().value == '(':
+            self.match(TokenType.PUNCTUATION, '(')
+            self.parse_D()
+            self.match(TokenType.PUNCTUATION, ')')
+            # no build_tree here – we just pass through
+
+        elif (
+            self.peek().type == TokenType.IDENTIFIER and
+            self.lookahead_is_vb_sequence()
+        ):
+            id_token = self.match(TokenType.IDENTIFIER)
+            self.stack.append(ASTNode(f"<ID:{id_token.value}>"))
+
+            count = 1
+            while self.is_start_of_Vb():
+                self.parse_Vb()
+                count += 1
+
+            self.match(TokenType.OPERATOR, '=')
+            self.parse_E()
+            build_tree('fcn_form', count + 1, self.stack)
+
+        else:
+            self.parse_Vl()
+            self.match(TokenType.OPERATOR, '=')
+            self.parse_E()
+            build_tree('=', 2, self.stack)
+
+    def is_start_of_Vb(self):
+        token = self.peek()
+        return (
+            token.type == TokenType.IDENTIFIER or
+            (token.type == TokenType.PUNCTUATION and token.value == '(')
+        )
+
+    def lookahead_is_vb_sequence(self):
+        # Is the next token part of a Vb? (after the first IDENTIFIER)
+        if self.pos + 1 >= len(self.tokens):
+            return False
+
+        next_token = self.tokens[self.pos + 1]
+        return (
+            next_token.type == TokenType.IDENTIFIER or
+            (next_token.type == TokenType.PUNCTUATION and next_token.value == '(')
+        )
+
+    def parse_Vb(self):
+        if self.peek().type == TokenType.PUNCTUATION and self.peek().value == '(':
+            self.match(TokenType.PUNCTUATION, '(')
+
+            # Check for empty tuple
+            if self.peek().type == TokenType.PUNCTUATION and self.peek().value == ')':
+                self.match(TokenType.PUNCTUATION, ')')
+                self.stack.append(ASTNode('()'))  # Empty binding
+            else:
+                self.parse_Vl()
+                self.match(TokenType.PUNCTUATION, ')')
+
+        else:
+            id_token = self.match(TokenType.IDENTIFIER)
+            self.stack.append(ASTNode(f"<ID:{id_token.value}>"))
+
+    def parse_Vl(self):
+        id_token = self.match(TokenType.IDENTIFIER)
+        self.stack.append(ASTNode(f"<ID:{id_token.value}>"))
+        count = 1
+
+        while self.peek().type == TokenType.PUNCTUATION and self.peek().value == ',':
+            self.match(TokenType.PUNCTUATION, ',')
+            id_token = self.match(TokenType.IDENTIFIER)
+            self.stack.append(ASTNode(f"<ID:{id_token.value}>"))
+            count += 1
+
+        if count > 1:
+            build_tree(',', count, self.stack)
