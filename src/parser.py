@@ -55,12 +55,64 @@ class Parser:
         else:
             self.parse_Ew()
 
-    def parse_D(self):
-        raise NotImplementedError("parse_D not yet implemented")
-
-    def parse_Vb(self):
-        raise NotImplementedError("parse_Vb not yet implemented")
-
     def parse_Ew(self):
-        raise NotImplementedError("parse_Ew not yet implemented")
+        self.parse_T()
 
+        if self.peek().type == TokenType.KEYWORD and self.peek().value == 'where':
+            self.match(TokenType.KEYWORD, 'where')
+            self.parse_Dr()
+            build_tree('where', 2, self.stack)
+
+    def parse_T(self):
+        self.parse_Ta()
+        count = 1
+
+        while self.peek().type == TokenType.PUNCTUATION and self.peek().value == ',':
+            self.match(TokenType.PUNCTUATION, ',')
+            self.parse_Ta()
+            count += 1
+
+        if count > 1:
+            build_tree('tau', count, self.stack)
+
+    def parse_Ta(self):
+        self.parse_Tc()
+
+        while self.peek().type == TokenType.KEYWORD and self.peek().value == 'aug':
+            self.match(TokenType.KEYWORD, 'aug')
+            self.parse_Tc()
+            build_tree('aug', 2, self.stack)
+
+    def parse_Tc(self):
+        self.parse_B()
+
+        if self.peek().type == TokenType.OPERATOR and self.peek().value == '->':
+            self.match(TokenType.OPERATOR, '->')
+            self.parse_Tc()
+            self.match(TokenType.OPERATOR, '|')
+            self.parse_Tc()
+            build_tree('->', 3, self.stack)
+
+    def parse_B(self):
+        self.parse_Bt()
+
+        while self.peek().type == TokenType.KEYWORD and self.peek().value == 'or':
+            self.match(TokenType.KEYWORD, 'or')
+            self.parse_Bt()
+            build_tree('or', 2, self.stack)
+
+    def parse_Bt(self):
+        self.parse_Bs()
+
+        while self.peek().type == TokenType.OPERATOR and self.peek().value == '&':
+            self.match(TokenType.OPERATOR, '&')
+            self.parse_Bs()
+            build_tree('&', 2, self.stack)
+
+    def parse_Bs(self):
+        if self.peek().type == TokenType.KEYWORD and self.peek().value == 'not':
+            self.match(TokenType.KEYWORD, 'not')
+            self.parse_Bp()
+            build_tree('not', 1, self.stack)
+        else:
+            self.parse_Bp()
