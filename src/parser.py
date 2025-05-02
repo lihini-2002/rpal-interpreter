@@ -27,3 +27,40 @@ class Parser:
             raise SyntaxError(
                 f"Unexpected token {token.value!r} at line {token.line}, column {token.column}. Expected {expected}."
             )
+        
+    def parse_E(self):
+        token = self.peek()
+
+        if token.type == TokenType.KEYWORD and token.value == 'let':
+            self.match(TokenType.KEYWORD, 'let')
+            self.parse_D()
+            self.match(TokenType.KEYWORD, 'in')
+            self.parse_E()
+            build_tree('let', 2, self.stack)
+
+        elif token.type == TokenType.KEYWORD and token.value == 'fn':
+            self.match(TokenType.KEYWORD, 'fn')
+
+            count = 0
+            while self.peek().type in {TokenType.IDENTIFIER, TokenType.PUNCTUATION}:
+                if self.peek().value == '(' or self.peek().value == ')':
+                    break
+                self.parse_Vb()
+                count += 1
+
+            self.match(TokenType.OPERATOR, '.')  # the dot in `fn ... . E`
+            self.parse_E()
+            build_tree('lambda', count + 1, self.stack)
+
+        else:
+            self.parse_Ew()
+
+    def parse_D(self):
+        raise NotImplementedError("parse_D not yet implemented")
+
+    def parse_Vb(self):
+        raise NotImplementedError("parse_Vb not yet implemented")
+
+    def parse_Ew(self):
+        raise NotImplementedError("parse_Ew not yet implemented")
+
