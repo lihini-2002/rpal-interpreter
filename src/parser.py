@@ -340,3 +340,9 @@ class Parser:
 
         if count > 1:
             build_tree(',', count, self.stack)
+
+    def parse(self):
+        self.parse_E()
+        if self.pos < len(self.tokens) - 1:
+            raise SyntaxError("Unexpected tokens after end of expression")
+        return self.stack.pop()
