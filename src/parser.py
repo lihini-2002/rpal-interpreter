@@ -116,3 +116,45 @@ class Parser:
             build_tree('not', 1, self.stack)
         else:
             self.parse_Bp()
+
+    def parse_Bp(self):
+        self.parse_A()
+
+        token = self.peek()
+        if token is None:
+            return
+
+        # Mapping of both keyword and operator to internal AST labels
+        relational_ops = {
+            'gr': 'gr', '>': 'gr',
+            'ge': 'ge', '>=': 'ge',
+            'ls': 'ls', '<': 'ls',
+            'le': 'le', '<=': 'le',
+            'eq': 'eq',
+            'ne': 'ne'
+        }
+
+        if token.value in relational_ops:
+            op_token = self.match(token.type, token.value)
+            self.parse_A()
+            build_tree(relational_ops[op_token.value], 2, self.stack)
+
+    def parse_A(self):
+        token = self.peek()
+
+        # Unary + or -
+        if token.type == TokenType.OPERATOR and token.value in {'+', '-'}:
+            op = self.match(TokenType.OPERATOR).value
+            self.parse_At()
+            if op == '-':
+                build_tree('neg', 1, self.stack)
+            # No AST node for unary '+'
+
+        else:
+            self.parse_At()
+
+            while self.peek().type == TokenType.OPERATOR and self.peek().value in {'+', '-'}:
+                op = self.match(TokenType.OPERATOR).value
+                self.parse_At()
+                build_tree(op, 2, self.stack)
+
