@@ -158,3 +158,32 @@ class Parser:
                 self.parse_At()
                 build_tree(op, 2, self.stack)
 
+    def parse_At(self):
+        self.parse_Af()
+
+        while self.peek().type == TokenType.OPERATOR and self.peek().value in {'*', '/'}:
+            op = self.match(TokenType.OPERATOR).value
+            self.parse_Af()
+            build_tree(op, 2, self.stack)
+
+    def parse_Af(self):
+        self.parse_Ap()
+
+        if self.peek().type == TokenType.OPERATOR and self.peek().value == '**':
+            self.match(TokenType.OPERATOR, '**')
+            self.parse_Af()
+            build_tree('**', 2, self.stack)
+
+    def parse_Ap(self):
+        self.parse_R()
+
+        while (
+            self.peek().type == TokenType.OPERATOR and self.peek().value == '@'
+        ):
+            self.match(TokenType.OPERATOR, '@')
+            id_token = self.match(TokenType.IDENTIFIER)
+            self.stack.append(ASTNode(f"<ID:{id_token.value}>"))
+            self.parse_R()
+            build_tree('@', 3, self.stack)
+    
+    
