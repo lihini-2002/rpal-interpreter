@@ -142,66 +142,105 @@
 [mvk-info] Created VkInstance for Vulkan version 1.0.0, as requested by app, with the following 2 Vulkan extensions enabled:
 	VK_KHR_external_memory_capabilities v1
 	VK_KHR_get_physical_device_properties2 v2
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f1f60 (vid 0000, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda164de0 (vid 0000, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f1b40 (vid 0000, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f1720 (vid 0000, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f1300 (vid 05ac, pid 8600): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f20c0 (vid 0000, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda164f40 (vid 0000, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f1ca0 (vid 0000, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f1880 (vid 0000, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f1460 (vid 05ac, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f2220 (vid 05ac, pid 8104): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f2500 (vid 05ac, pid 8104): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f1e00 (vid 0000, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda164c80 (vid 0000, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f19e0 (vid 0000, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f15c0 (vid 0000, pid 0000): not a joystick or gamepad
-00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fcfda1f2660 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d13300 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d12ee0 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d12ac0 (vid 05ac, pid 8600): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d141f0 (vid 05ac, pid 8104): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d13460 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d13e70 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d13040 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d12c20 (vid 05ac, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d14350 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d135c0 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d13fd0 (vid 05ac, pid 8104): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d131a0 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d12d80 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d146c0 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d144b0 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d13720 (vid 0000, pid 0000): not a joystick or gamepad
+00e8:err:hid:handle_DeviceMatchingCallback Ignoring HID device 0x7fa8e1d148d0 (vid 0000, pid 0000): not a joystick or gamepad
 0024:err:environ:init_peb starting L"Z:\\Users\\gayathriharshila\\rpal-interpreter\\rpal-wine\\rpal.exe" in experimental wow64 mode
 let 
-.function_form 
-..<ID:Sum> 
-..<ID:A> 
-..where 
-...gamma 
-....<ID:Psum> 
-....tau 
-.....<ID:A> 
-.....gamma 
-......<ID:Order> 
-......<ID:A> 
-...rec 
-....function_form 
-.....<ID:Psum> 
-....., 
-......<ID:T> 
+.rec 
+..function_form 
+...<ID:T> 
+...<ID:a> 
+...<ID:b> 
+...<ID:c> 
+...<ID:N> 
+...@ 
+....@ 
+.....@ 
+......@ 
+.......@ 
+........@ 
+.........-> 
+..........gr 
+...........<ID:N> 
+...........<INT:1> 
+..........gamma 
+...........gamma 
+............gamma 
+.............gamma 
+..............<ID:T> 
+..............<ID:a> 
+.............<ID:c> 
+............<ID:b> 
+...........- 
+............<ID:N> 
+............<INT:1> 
+..........<STR:''> 
+.........<ID:Conc> 
+.........<STR:'Move '> 
+........<ID:Conc> 
+........<ID:a> 
+.......<ID:Conc> 
+.......<STR:' to '> 
+......<ID:Conc> 
+......<ID:b> 
+.....<ID:Conc> 
+.....<STR:'\n'> 
+....<ID:Conc> 
+....-> 
+.....gr 
 ......<ID:N> 
-.....-> 
-......eq 
-.......<ID:N> 
-.......<INT:0> 
-......<INT:0> 
-......+ 
+......<INT:1> 
+.....gamma 
+......gamma 
 .......gamma 
-........<ID:Psum> 
-........tau 
+........gamma 
 .........<ID:T> 
-.........- 
-..........<ID:N> 
-..........<INT:1> 
-.......gamma 
-........<ID:T> 
-........<ID:N> 
+.........<ID:c> 
+........<ID:b> 
+.......<ID:a> 
+......- 
+.......<ID:N> 
+.......<INT:1> 
+.....<STR:''> 
 .gamma 
 ..<ID:Print> 
 ..gamma 
-...<ID:Sum> 
-...tau 
-....<INT:1> 
-....<INT:2> 
-....<INT:3> 
-....<INT:4> 
-....<INT:5> 
-15
+...gamma 
+....gamma 
+.....gamma 
+......<ID:T> 
+......<STR:'A'> 
+.....<STR:'B'> 
+....<STR:'C'> 
+...<INT:4> 
+Move A to C
+Move A to B
+Move C to B
+Move A to C
+Move B to A
+Move B to C
+Move A to C
+Move A to B
+Move C to B
+Move C to A
+Move B to A
+Move C to B
+Move A to C
+Move A to B
+Move C to B
+

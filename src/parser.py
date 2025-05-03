@@ -231,7 +231,9 @@ class Parser:
 
         elif token.type == TokenType.KEYWORD and token.value in {'true', 'false', 'nil', 'dummy'}:
             token = self.match(TokenType.KEYWORD)
-            self.stack.append(ASTNode(token.value))  # Use plain label like 'true', 'nil', etc.
+            label = f"<{token.value}>" if token.value == "nil" else token.value
+            self.stack.append(ASTNode(label))
+
 
         else:
             raise SyntaxError(f"Unexpected token in Rn: {token}")

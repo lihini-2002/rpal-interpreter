@@ -14,14 +14,22 @@ def extract_ast_only(lines):
     - OR look like AST node labels like 'let', 'gamma', etc.
     """
     ast_lines = []
-    start_recording = False
     for line in lines:
         stripped = line.strip()
         if stripped == "":
             continue
-        if stripped.startswith((".", "let", "gamma", "function_form", "within", "rec", "tau", "or", "and", "not", "eq", "ne", "aug", "@", "->", "where")) or stripped.startswith("<ID:") or stripped.startswith("<STR:") or stripped in {"true", "false", "nil", "()"}:
+        if (
+            stripped.startswith((".", "let", "gamma", "function_form", "within", "rec", "tau", "or", "and", "not", "eq", "ne", "aug", "@", "->", "where"))
+            or stripped.startswith("<ID:")
+            or stripped.startswith("<STR:")
+            or stripped in {"true", "false", "nil", "()", "<nil>"}
+        ):
             ast_lines.append(stripped)
     return ast_lines
+
+def normalize(line):
+    """Remove insignificant differences like extra spaces"""
+    return line.strip().replace(" ", "").replace("\t", "")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -48,7 +56,6 @@ if __name__ == "__main__":
         my_lines = [line.strip() for line in f1 if line.strip()]
         rpal_raw_lines = [line.rstrip() for line in f2]
 
-    # Filter RPAL output to get AST only
     rpal_ast_lines = [line.strip() for line in extract_ast_only(rpal_raw_lines) if line.strip()]
 
     if my_lines == rpal_ast_lines:
@@ -59,3 +66,12 @@ if __name__ == "__main__":
         print("\n".join(my_lines))
         print("\n=== RPAL.exe Output (AST only) ===")
         print("\n".join(rpal_ast_lines))
+
+        # Optional: Show side-by-side comparison
+        print("\n🔍 Detailed Diff:")
+        max_len = max(len(my_lines), len(rpal_ast_lines))
+        for i in range(max_len):
+            yours = my_lines[i] if i < len(my_lines) else "<no line>"
+            theirs = rpal_ast_lines[i] if i < len(rpal_ast_lines) else "<no line>"
+            prefix = "✅" if normalize(yours) == normalize(theirs) else "❌"
+            print(f"{prefix} Line {i+1}:\n  Yours : {yours!r}\n  RPAL  : {theirs!r}")

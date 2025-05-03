@@ -71,7 +71,7 @@ class Lexer:
             elif kind == 'INTEGER':
                 self.tokens.append(Token(TokenType.INTEGER, int(value), self.line, column))
             elif kind == 'STRING':
-                self.tokens.append(Token(TokenType.STRING, value[1:-1], self.line, column))
+                self.tokens.append(Token(TokenType.STRING, value, self.line, column))
             elif kind == 'OPERATOR':
                 self.tokens.append(Token(TokenType.OPERATOR, value, self.line, column))
             elif kind == 'PUNCTUATION':
