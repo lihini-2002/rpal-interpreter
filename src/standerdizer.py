@@ -1,5 +1,5 @@
 from src.rpal_ast import ASTNode
-from utils import get_children, set_children
+from src.utils import get_children, set_children
 
 def standardize(node: ASTNode) -> ASTNode:
     """
