@@ -1,8 +1,12 @@
 import argparse
 from src.lexer import Lexer
 from src.parser import Parser
+from src.standerizer.ast import AST
+from src.standerizer.node import Node
+from src.standerizer import ast_factory
+from src.lcrs_to_nary_convertor import lcrs_to_nary
 from src.rpal_ast import print_ast
-from src.standerdizer import standardize
+from src.standerdizer import Standardizer
 from src.control_generator import generate_control, control_structures
 from src.cse_machine import evaluate
 
@@ -31,31 +35,22 @@ def main():
         print_ast(ast_root)
         return
 
-    print("==== RAW AST BEFORE STANDARDIZATION ====")
-    print_ast(ast_root)
+    # Step 5: Convert LCRS AST to senior-style n-ary tree
+    nary_root = lcrs_to_nary(ast_root)
 
-    # Step 5: Standardize
-    standardized_ast = standardize(ast_root)
+    # Wrap in AST object
+    ast_obj = AST(nary_root)
+
+    # Step 6: Standardize
+    ast_obj.standardize()
 
     # If -st → print standardized AST and exit
     if args.st:
         print("Standardized AST:")
-        print_ast(standardized_ast)
+        ast_obj.print_ast()
         return
 
-    # Step 6: Generate Control Structure
-    control = generate_control(standardized_ast)
-    print("Main Control:")
-    print(control)
-    print("\nLambda Bodies (Control Structures):")
-    for i, c in control_structures:
-        print(f"delta {i} → {c}")
 
-    # Step 7: Evaluate with CSE Machine
-    result = evaluate(control, control_structures)
-
-    # Step 8: Print final result
-    print(result)
 
 if __name__ == "__main__":
     main()

@@ -1,261 +1,202 @@
 from src.rpal_ast import ASTNode
-from src.utils import get_children, set_children
 
-def standardize(node: ASTNode) -> ASTNode:
-    """
-    Entry point: recursively transforms the AST into standard form.
-    """
-    if node is None:
-        return None
+class Standardizer:
+    def standardize(self, node):
+        if node is None:
+            return None
 
-    # Standardize children first (post-order traversal)
-    children = get_children(node)
-    standardized = [standardize(child) for child in children]
-    set_children(node, standardized)
+        node.left = self.standardize(node.left)
+        node.right = self.standardize(node.right)
 
-    # Apply specific transformation rule if applicable
-    return apply_transformation(node)
+        if node.label == "let":
+            return self._standardize_let(node)
+        elif node.label == "where":
+            return self._standardize_where(node)
+        elif node.label == "function_form":
+            return self._standardize_function_form(node)
+        elif node.label == "lambda":
+            return self._standardize_lambda(node)
+        elif node.label == "within":
+            return self._standardize_within(node)
+        elif node.label == "@":
+            return self._standardize_at(node)
+        elif node.label == "and":
+            return self._standardize_and(node)
+        elif node.label == "rec":
+            return self._standardize_rec(node)
 
-def apply_transformation(node: ASTNode) -> ASTNode:
-    label = node.label
-    children = get_children(node)
-
-    # Rule 1: let => gamma(lambda x . E) E
-    if label == "let":
-        function_def = children[0]
-        body = children[1]
-
-        # Standardize the function_form to (= Sum lambda A . ...)
-        eq_node = standardize(function_def)
-        fname, fval = get_children(eq_node)  # fname = <ID:Sum>, fval = lambda A ...
-
-        # Wrap body with lambda Sum. <body>
-        lam = ASTNode("lambda")
-        set_children(lam, [fname, body])
-
-        # gamma(lambda Sum. <body>, lambda A ...)
-        gamma = ASTNode("gamma")
-        set_children(gamma, [lam, fval])
-
-        return gamma
-
-    # Rule 2: where => gamma(lambda x . body, e)
-    if label == "where":
-        body = children[0]
-        eq = children[1]
-        eq_children = get_children(eq)
-        x = eq_children[0]
-        e = eq_children[1]
-
-        lambda_node = ASTNode("lambda")
-        set_children(lambda_node, [x, body])
-
-        gamma_node = ASTNode("gamma")
-        set_children(gamma_node, [lambda_node, e])
-        return gamma_node
-
-    # Rule 3: @ => gamma(E1, E2)
-    if label == "@":
-        E1, E2 = children
-        gamma_node = ASTNode("gamma")
-        set_children(gamma_node, [E1, E2])
-        return gamma_node
-
-    if label == "tau":
-        exprs = get_children(node)
-
-        if len(exprs) == 1:
-            return exprs[0]
-
-        # Create a tau_n node whose children are the elements of the tuple
-        tau_node = ASTNode(f"tau {len(exprs)}")
-        set_children(tau_node, exprs)
-        
-        return tau_node
-
-    if label == "not":
-        E = children[0]
-        gamma = ASTNode("gamma")
-        set_children(gamma, [ASTNode("not"), E])
-        return gamma
-
-    if label == "within":
-        first_eq = children[0]
-        second_eq = children[1]
-
-        X1, E1 = get_children(first_eq)
-        X2, E2 = get_children(second_eq)
-
-        # lambda X1 . E2
-        lambda_node = ASTNode("lambda")
-        set_children(lambda_node, [X1, E2])
-
-        # gamma(lambda X1 . E2, E1)
-        gamma_node = ASTNode("gamma")
-        set_children(gamma_node, [lambda_node, E1])
-
-        # = (X2, gamma(...))
-        eq_node = ASTNode("=")
-        set_children(eq_node, [X2, gamma_node])
-
-        return eq_node
-
-    if label == "->":
-        B, T, E = children
-
-        # lambda ( ) . T
-        empty_tuple = ASTNode("()")
-        lambda_then = ASTNode("lambda")
-        set_children(lambda_then, [empty_tuple, T])
-
-        gamma_cond = ASTNode("gamma")
-        set_children(gamma_cond, [ASTNode("Cond"), B])
-
-        gamma_then = ASTNode("gamma")
-        set_children(gamma_then, [gamma_cond, lambda_then])
-
-        # lambda ( ) . E
-        lambda_else = ASTNode("lambda")
-        set_children(lambda_else, [empty_tuple, E])
-
-        inner_gamma = ASTNode("gamma")
-        set_children(inner_gamma, [ASTNode("nil"), gamma_then])
-
-        outer_gamma = ASTNode("gamma")
-        set_children(outer_gamma, [inner_gamma, lambda_else])
-        return outer_gamma
-
-    if label == "neg":
-        E = children[0]
-        gamma = ASTNode("gamma")
-        set_children(gamma, [ASTNode("neg"), E])
-        return gamma
-
-    if label == "rec":
-        eq_node = children[0]
-        X, E = get_children(eq_node)
-
-        lambda_node = ASTNode("lambda")
-        set_children(lambda_node, [X, E])
-
-        gamma_node = ASTNode("gamma")
-        set_children(gamma_node, [ASTNode("Ystar"), lambda_node])
-
-        eq_transformed = ASTNode("=")
-        set_children(eq_transformed, [X, gamma_node])
-        return eq_transformed
-
-    if label == "function_form":
-        P = children[0]  # function name
-        param_node = children[1]
-        E = children[2]
-
-        # Handle single or multiple params
-        if param_node.label == ",":
-            params = get_children(param_node)
-        else:
-            params = [param_node]
-
-        # Wrap in nested lambdas
-        current = E
-        for param in reversed(params):
-            lam = ASTNode("lambda")
-            set_children(lam, [param, current])
-            current = lam
-
-        eq_node = ASTNode("=")
-        set_children(eq_node, [P, current])
-        return eq_node
-
-    if label == "and":
-        eqs = get_children(children[0])  # The =++ node
-        Xs = []
-        Es = []
-
-        for eq in eqs:
-            xi, ei = get_children(eq)
-            Xs.append(xi)
-            Es.append(ei)
-
-        tau_left = ASTNode("tau")
-        set_children(tau_left, Xs)
-
-        tau_right = ASTNode("tau")
-        set_children(tau_right, Es)
-
-        eq_node = ASTNode("=")
-        set_children(eq_node, [tau_left, tau_right])
-        return eq_node
-
-    if label == "lambda":
-        V_or_tuple = children[0]
-        E = children[1]
-
-        # Case 1: lambda with multiple parameters (V++)
-        params = get_children(V_or_tuple)
-        if len(params) > 1:
-            # Curry them into nested lambdas
-            current = E
-            for param in reversed(params):
-                lam = ASTNode("lambda")
-                set_children(lam, [param, current])
-                current = lam
-            return current
-
-        # Case 2: lambda (X, i)  -- tuple binding with integer
-        elif V_or_tuple.label == ",":
-            parts = get_children(V_or_tuple)
-            if len(parts) == 2 and parts[1].label.startswith("<INT:"):
-                xi = ASTNode(".")           # Dot access node: X.i
-                set_children(xi, parts)     # children = [X, i]
-
-                dotE = ASTNode(".")         # Dot access for function body
-                set_children(dotE, [E, parts[1]])
-
-                lam_inner = ASTNode("lambda")
-                set_children(lam_inner, [xi, dotE])
-
-                gamma = ASTNode("gamma")
-                set_children(gamma, [ASTNode("lambda"), lam_inner, ASTNode("Temp")])
-
-                lam_outer = ASTNode("lambda")
-                set_children(lam_outer, [ASTNode("Temp"), gamma])
-                return lam_outer
-
-        # Otherwise, return as-is (already standard)
         return node
 
-    # Handle binary operators
-    binary_operators = {
-        "aug", "or", "&", "+", "-", "/", "*", "**", "gr", "ge", "ls", "le", "eq", "ne"
-    }
+    def _copy_subtree(self, node):
+        if node is None:
+            return None
+        new_node = ASTNode(node.label)
+        new_node.left = self._copy_subtree(node.left)
+        new_node.right = self._copy_subtree(node.right)
+        return new_node
 
-    if label in binary_operators:
-        if len(children) != 2:
-            print(f"⚠️  Skipping malformed binary operator node: {label} with children {children}")
-            return node  # or raise a clearer error
-        E1, E2 = children
+    def _standardize_let(self, node):
+        equal = node.left
+        expr = self._copy_subtree(equal.right)
+        var = self._copy_subtree(equal.left)
 
-        # gamma(Op, E1)
-        gamma_inner = ASTNode("gamma")
-        set_children(gamma_inner, [ASTNode(label), E1])
+        lambda_node = ASTNode("lambda")
+        lambda_node.left = var
+        var.right = expr
 
-        # gamma(gamma(Op, E1), E2)
-        gamma_outer = ASTNode("gamma")
-        set_children(gamma_outer, [gamma_inner, E2])
-        return gamma_outer
+        gamma_node = ASTNode("gamma")
+        gamma_node.left = lambda_node
+        lambda_node.right = self._copy_subtree(node.left.right)
 
-    # Apply V++ as nested gamma calls
-    if len(children) > 2 and label == "gamma":
-        # Turn gamma(E, V1, V2, V3) → gamma(gamma(gamma(E, V1), V2), V3)
-        base = ASTNode("gamma")
-        set_children(base, [children[0], children[1]])
+        return gamma_node
 
-        for arg in children[2:]:
-            next_gamma = ASTNode("gamma")
-            set_children(next_gamma, [base, arg])
-            base = next_gamma
+    def _standardize_where(self, node):
+        expr = self._copy_subtree(node.left)
+        equal = self._copy_subtree(expr.right)
+        let_node = ASTNode("let")
+        let_node.left = equal
+        equal.right = expr
+        return self._standardize_let(let_node)
 
-        return base
+    def _standardize_function_form(self, node):
+        # Traverse all children
+        children = []
+        curr = node.left  # Start from first child (e.g., <ID:Sum>)
+        while curr:
+            children.append(self._copy_subtree(curr))
+            curr = curr.right
 
-    return node  # No change if no rule applies
+        name = children[0]
+        params = children[1:-1]
+        expr = children[-1]
+
+        # Build nested lambdas
+        current_lambda = ASTNode("lambda")
+        current_lambda.left = params[0]
+        temp = current_lambda
+
+        for param in params[1:]:
+            new_lambda = ASTNode("lambda")
+            param_node = param
+            temp.left.right = new_lambda
+            new_lambda.left = param_node
+            temp = new_lambda
+
+        temp.left.right = expr  # Attach the expression at the end
+
+        equal = ASTNode("=")
+        equal.left = name
+        name.right = current_lambda
+
+        return equal
+
+    def _standardize_lambda(self, node):
+        param = self._copy_subtree(node.left)
+        expr = param
+        while expr.right:
+            expr = expr.right
+
+        expr = self._copy_subtree(expr)
+
+        current_lambda = ASTNode("lambda")
+        current_lambda.left = param
+        temp = current_lambda
+
+        param = param.right
+        while param and param.label != expr.label:
+            new_lambda = ASTNode("lambda")
+            new_lambda.left = self._copy_subtree(param)
+            temp.left.right = new_lambda
+            temp = new_lambda
+            param = param.right
+
+        temp.left.right = expr
+
+        return current_lambda
+
+    def _standardize_within(self, node):
+        equal1 = node.left
+        equal2 = equal1.right
+        x1 = self._copy_subtree(equal1.left)
+        e1 = self._copy_subtree(x1.right)
+        x2 = self._copy_subtree(equal2.left)
+        e2 = self._copy_subtree(x2.right)
+
+        lambda_node = ASTNode("lambda")
+        lambda_node.left = x1
+        x1.right = e2
+
+        gamma_node = ASTNode("gamma")
+        gamma_node.left = lambda_node
+        lambda_node.right = e1
+
+        equal_node = ASTNode("=")
+        equal_node.left = x2
+        x2.right = gamma_node
+
+        return equal_node
+
+    def _standardize_at(self, node):
+        e1 = self._copy_subtree(node.left)
+        n = self._copy_subtree(e1.right)
+        e2 = self._copy_subtree(n.right)
+
+        gamma1 = ASTNode("gamma")
+        gamma1.left = n
+        n.right = e1
+
+        gamma2 = ASTNode("gamma")
+        gamma2.left = gamma1
+        gamma1.right = e2
+
+        return gamma2
+
+    def _standardize_and(self, node):
+        comma = ASTNode(",")
+        tau = ASTNode("tau")
+        comma_curr = comma
+        tau_curr = tau
+
+        equal = node.left
+        while equal:
+            x = self._copy_subtree(equal.left)
+            e = self._copy_subtree(x.right)
+
+            if comma_curr.left:
+                comma_curr.right = ASTNode(",")
+                comma_curr = comma_curr.right
+            comma_curr.left = x
+
+            if tau_curr.left:
+                tau_curr.right = ASTNode("tau")
+                tau_curr = tau_curr.right
+            tau_curr.left = e
+
+            equal = equal.right
+
+        equal_node = ASTNode("=")
+        equal_node.left = comma
+        comma.right = tau
+
+        return equal_node
+
+    def _standardize_rec(self, node):
+        equal = node.left
+        x = self._copy_subtree(equal.left)
+        e = self._copy_subtree(x.right)
+
+        lambda_node = ASTNode("lambda")
+        lambda_node.left = self._copy_subtree(x)
+        lambda_node.left.right = self._copy_subtree(e)
+
+        ystar = ASTNode("<Y*>")
+
+        gamma_node = ASTNode("gamma")
+        gamma_node.left = ystar
+        ystar.right = lambda_node
+
+        equal_node = ASTNode("=")
+        equal_node.left = self._copy_subtree(x)
+        equal_node.left.right = gamma_node
+
+        return equal_node
