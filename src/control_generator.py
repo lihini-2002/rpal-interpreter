@@ -6,12 +6,8 @@ control_structures = []  # List of lists (one per lambda body)
 control_index = 0        # Global control structure index
 
 def generate_control(node: ASTNode) -> List:
-    """
-    Entry point to generate control structure from a standardized AST.
-    Returns a flat list of control instructions.
-    """
     global control_structures, control_index
-    control_structures = []
+    control_structures.clear()  # ✅ Do this instead of reassigning
     control_index = 0
 
     control = []
@@ -19,9 +15,11 @@ def generate_control(node: ASTNode) -> List:
     return control
 
 def _traverse(node: ASTNode, control: List):
-    global control_index  # Access global control index
+    global control_structures, control_index
     if node is None:
         return
+
+    print(f"Visiting: {node.label}")
 
     label = node.label
     children = get_children(node)
@@ -40,6 +38,7 @@ def _traverse(node: ASTNode, control: List):
         control_structures.append((current_index, new_control))
 
         # Add <lambda i param> instruction
+        print(f"Recording lambda {current_index} with param: {param.label}")
         control.append(("lambda", current_index, param.label))
 
     # Handle binary gamma

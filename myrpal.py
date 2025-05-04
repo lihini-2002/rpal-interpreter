@@ -32,6 +32,9 @@ def main():
         print_ast(ast_root)
         return
 
+    print("==== RAW AST BEFORE STANDARDIZATION ====")
+    print_ast(ast_root)
+
     # Step 5: Standardize
     standardized_ast = standardize(ast_root)
 
@@ -43,6 +46,11 @@ def main():
 
     # Step 6: Generate Control Structure
     control = generate_control(standardized_ast)
+    print("Main Control:")
+    print(control)
+    print("\nLambda Bodies (Control Structures):")
+    for i, c in control_structures:
+        print(f"delta {i} → {c}")
 
     # Step 7: Evaluate with CSE Machine
     result = evaluate(control, control_structures)

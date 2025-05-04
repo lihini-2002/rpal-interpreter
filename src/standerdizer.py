@@ -232,4 +232,17 @@ def apply_transformation(node: ASTNode) -> ASTNode:
         set_children(gamma_outer, [gamma_inner, E2])
         return gamma_outer
 
+    # Apply V++ as nested gamma calls
+    if len(children) > 2 and label == "gamma":
+        # Turn gamma(E, V1, V2, V3) → gamma(gamma(gamma(E, V1), V2), V3)
+        base = ASTNode("gamma")
+        set_children(base, [children[0], children[1]])
+
+        for arg in children[2:]:
+            next_gamma = ASTNode("gamma")
+            set_children(next_gamma, [base, arg])
+            base = next_gamma
+
+        return base
+
     return node  # No change if no rule applies

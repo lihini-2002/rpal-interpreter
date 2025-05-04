@@ -10,11 +10,20 @@ class Closure:
 
     def __repr__(self):
         return f"<Closure λ{self.index} {self.param}>"
+    
+class TupleValue:
+    def __init__(self, elements):
+        self.elements = elements
+
+    def __repr__(self):
+        return f"Tuple{self.elements}"
+
 
 def lookup(name: str, env: List[dict]):
     for scope in reversed(env):
         if name in scope:
             return scope[name]
+    print("Env dump:", env)  # 👈 Add this
     raise Exception(f"Unbound variable: {name}")
 
 def apply_operator(op: str, S: List):
@@ -62,8 +71,29 @@ def evaluate(control: List, control_structures: List[Tuple[int, List]]):
             S.append(closure)
 
         elif instr == "gamma":
-            rand = S.pop()   # ⬅️ FIRST: pop the argument
-            rator = S.pop()  # ⬅️ THEN: pop the operator (closure)
+            rand = S.pop()   # FIRST: pop the argument
+            rator = S.pop()  # THEN: pop the operator (closure)
+
+            # Handle built-in Order operator
+            if rator == "<ID:Order>":
+                if isinstance(rand, TupleValue):
+                    S.append(len(rand.elements))
+                else:
+                    raise Exception("Order applied to non-tuple")
+                continue
+            
+            # Handle built-in Print operator
+            if rator == "<ID:Print>":
+                print(rand)
+                S.append(rand)
+                continue
+
+            # Tuple projection: TupleValue applied to index
+            if isinstance(rator, TupleValue) and isinstance(rand, int):
+                if not (1 <= rand <= len(rator.elements)):
+                    raise Exception(f"Tuple index out of bounds: {rand}")
+                S.append(rator.elements[rand - 1])
+                continue
 
 
             if isinstance(rator, Closure):
@@ -72,6 +102,7 @@ def evaluate(control: List, control_structures: List[Tuple[int, List]]):
                 # Push new environment marker
                 C.appendleft(("env_pop",))  # pop it later
                 E.append({rator.param: rand})
+                print(f"Binding param {rator.param} to value {rand}")
                 # Push function body to control
                 body = next(cs[1] for cs in control_structures if cs[0] == rator.index)
                 for op in reversed(body):
@@ -80,8 +111,7 @@ def evaluate(control: List, control_structures: List[Tuple[int, List]]):
                 raise Exception(f"Cannot apply non-closure: {rator}")
 
         elif isinstance(instr, str) and instr.startswith("<ID:"):
-            name = instr[4:-1]
-            val = lookup(name, E)
+            val = lookup(instr, E)  # Use the full string like "<ID:A>"
             S.append(val)
 
         elif isinstance(instr, str) and instr.startswith("<INT:"):
@@ -93,6 +123,14 @@ def evaluate(control: List, control_structures: List[Tuple[int, List]]):
 
         elif isinstance(instr, tuple) and instr[0] == "env_pop":
             E.pop()
+        
+        elif isinstance(instr, str) and instr.startswith("tau "):
+            count = int(instr.split()[1])
+            elements = []
+            for _ in range(count):
+                elements.append(S.pop())
+            elements.reverse()  # because stack pops right to left
+            S.append(TupleValue(elements))
 
         else:
             S.append(instr)
