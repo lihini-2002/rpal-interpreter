@@ -19,6 +19,7 @@ def generate_control(node: ASTNode) -> List:
     return control
 
 def _traverse(node: ASTNode, control: List):
+    global control_index  # Access global control index
     if node is None:
         return
 
@@ -43,9 +44,10 @@ def _traverse(node: ASTNode, control: List):
 
     # Handle binary gamma
     elif label == "gamma":
-        control.append("gamma")
-        _traverse(children[0], control)
-        _traverse(children[1], control)
+        _traverse(children[1], control)  # First: right (argument)
+        _traverse(children[0], control)  # Then: left (function)
+        control.append("gamma")          # Then: gamma instruction
+
 
     # Handle constants and names (leaf nodes)
     elif label.startswith("<") and label.endswith(">"):

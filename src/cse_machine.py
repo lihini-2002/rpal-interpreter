@@ -62,8 +62,9 @@ def evaluate(control: List, control_structures: List[Tuple[int, List]]):
             S.append(closure)
 
         elif instr == "gamma":
-            rator = S.pop()
-            rand = S.pop()
+            rand = S.pop()   # ⬅️ FIRST: pop the argument
+            rator = S.pop()  # ⬅️ THEN: pop the operator (closure)
+
 
             if isinstance(rator, Closure):
                 # New environment: add binding of param to rand
