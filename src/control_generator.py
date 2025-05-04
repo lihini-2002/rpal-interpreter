@@ -1,5 +1,5 @@
-from rpal_ast import ASTNode
-from utils import get_children
+from src.rpal_ast import ASTNode
+from src.utils import get_children
 from typing import List, Tuple
 
 control_structures = []  # List of lists (one per lambda body)
