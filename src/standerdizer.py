@@ -24,16 +24,21 @@ def apply_transformation(node: ASTNode) -> ASTNode:
     if label == "let":
         eq = children[0]
         body = children[1]
+
+        # eq will be (= Sum (lambda A. expr))
         eq_children = get_children(eq)
-        x = eq_children[0]
-        e = eq_children[1]
+        if eq.label == "=" and len(eq_children) == 2:
+            x = eq_children[0]  # <ID:Sum>
+            e = eq_children[1]  # lambda A . ...
 
-        lambda_node = ASTNode("lambda")
-        set_children(lambda_node, [x, body])
+            # body likely uses <ID:Sum>, so this is correct
+            lambda_node = ASTNode("lambda")
+            set_children(lambda_node, [x, body])
 
-        gamma_node = ASTNode("gamma")
-        set_children(gamma_node, [lambda_node, e])
-        return gamma_node
+            gamma_node = ASTNode("gamma")
+            set_children(gamma_node, [lambda_node, e])
+            return gamma_node
+
 
     # Rule 2: where => gamma(lambda x . body, e)
     if label == "where":
