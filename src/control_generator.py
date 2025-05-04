@@ -5,6 +5,19 @@ from typing import List, Tuple
 control_structures = []  # List of lists (one per lambda body)
 control_index = 0        # Global control structure index
 
+def generate_control(node: ASTNode) -> List:
+    """
+    Entry point to generate control structure from a standardized AST.
+    Returns a flat list of control instructions.
+    """
+    global control_structures, control_index
+    control_structures = []
+    control_index = 0
+
+    control = []
+    _traverse(node, control)
+    return control
+
 def _traverse(node: ASTNode, control: List):
     if node is None:
         return
@@ -55,15 +68,3 @@ def _traverse(node: ASTNode, control: List):
         for child in children:
             _traverse(child, control)
 
-def generate_control(node: ASTNode) -> List:
-    """
-    Entry point to generate control structure from a standardized AST.
-    Returns a flat list of control instructions.
-    """
-    global control_structures, control_index
-    control_structures = []
-    control_index = 0
-
-    control = []
-    _traverse(node, control)
-    return control
