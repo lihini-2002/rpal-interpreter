@@ -22,23 +22,22 @@ def apply_transformation(node: ASTNode) -> ASTNode:
 
     # Rule 1: let => gamma(lambda x . E) E
     if label == "let":
-        eq = children[0]
+        function_def = children[0]
         body = children[1]
 
-        # eq will be (= Sum (lambda A. expr))
-        eq_children = get_children(eq)
-        if eq.label == "=" and len(eq_children) == 2:
-            x = eq_children[0]  # <ID:Sum>
-            e = eq_children[1]  # lambda A . ...
+        # Standardize the function_form to (= Sum lambda A . ...)
+        eq_node = standardize(function_def)
+        fname, fval = get_children(eq_node)  # fname = <ID:Sum>, fval = lambda A ...
 
-            # body likely uses <ID:Sum>, so this is correct
-            lambda_node = ASTNode("lambda")
-            set_children(lambda_node, [x, body])
+        # Wrap body with lambda Sum. <body>
+        lam = ASTNode("lambda")
+        set_children(lam, [fname, body])
 
-            gamma_node = ASTNode("gamma")
-            set_children(gamma_node, [lambda_node, e])
-            return gamma_node
+        # gamma(lambda Sum. <body>, lambda A ...)
+        gamma = ASTNode("gamma")
+        set_children(gamma, [lam, fval])
 
+        return gamma
 
     # Rule 2: where => gamma(lambda x . body, e)
     if label == "where":
@@ -65,14 +64,14 @@ def apply_transformation(node: ASTNode) -> ASTNode:
     if label == "tau":
         exprs = get_children(node)
 
-        # Create gamma(aug, .nil)
-        gamma_inner = ASTNode("gamma")
-        set_children(gamma_inner, [ASTNode("aug"), ASTNode(".nil")])
+        if len(exprs) == 1:
+            return exprs[0]
 
-        # Nest expressions on top: gamma(..., E1, E2, ...)
-        gamma = ASTNode("gamma")
-        set_children(gamma, [gamma_inner] + exprs)
-        return gamma
+        # Create a tau_n node whose children are the elements of the tuple
+        tau_node = ASTNode(f"tau {len(exprs)}")
+        set_children(tau_node, exprs)
+        
+        return tau_node
 
     if label == "not":
         E = children[0]
@@ -147,11 +146,17 @@ def apply_transformation(node: ASTNode) -> ASTNode:
         return eq_transformed
 
     if label == "function_form":
-        P = children[0]      # Function name
-        params = get_children(children[1])  # V++
-        E = children[2]      # Function body
+        P = children[0]  # function name
+        param_node = children[1]
+        E = children[2]
 
-        # Build nested lambdas from last param to first
+        # Handle single or multiple params
+        if param_node.label == ",":
+            params = get_children(param_node)
+        else:
+            params = [param_node]
+
+        # Wrap in nested lambdas
         current = E
         for param in reversed(params):
             lam = ASTNode("lambda")
@@ -226,6 +231,9 @@ def apply_transformation(node: ASTNode) -> ASTNode:
     }
 
     if label in binary_operators:
+        if len(children) != 2:
+            print(f"⚠️  Skipping malformed binary operator node: {label} with children {children}")
+            return node  # or raise a clearer error
         E1, E2 = children
 
         # gamma(Op, E1)

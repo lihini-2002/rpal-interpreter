@@ -20,7 +20,6 @@ def _traverse(node: ASTNode, control: List):
         return
 
     print(f"Visiting: {node.label}")
-
     label = node.label
     children = get_children(node)
 
@@ -29,7 +28,6 @@ def _traverse(node: ASTNode, control: List):
         param = children[0]
         body = children[1]
 
-        # Create control structure for lambda body (new index)
         current_index = control_index
         control_index += 1
 
@@ -37,35 +35,24 @@ def _traverse(node: ASTNode, control: List):
         _traverse(body, new_control)
         control_structures.append((current_index, new_control))
 
-        # Add <lambda i param> instruction
         print(f"Recording lambda {current_index} with param: {param.label}")
         control.append(("lambda", current_index, param.label))
 
-    # Handle binary gamma
     elif label == "gamma":
-        _traverse(children[1], control)  # First: right (argument)
-        _traverse(children[0], control)  # Then: left (function)
-        control.append("gamma")          # Then: gamma instruction
+        _traverse(children[0], control)  # ✅ function first
+        _traverse(children[1], control)  # ✅ argument second
+        control.append("gamma")
 
+    elif label == "tau":
+        for child in reversed(children):
+            _traverse(child, control)
+        control.append(f"tau {len(children)}")
 
-    # Handle constants and names (leaf nodes)
     elif label.startswith("<") and label.endswith(">"):
         control.append(label)
 
-    # Handle conditional
-    elif label == "->":
-        pass  # already standardized as nested lambdas — no need to handle here
-
-    # Handle tau
-    elif label == "tau":
-        control.append(f"tau {len(children)}")
-        # Right-to-left evaluation
-        for child in reversed(children):
-            _traverse(child, control)
-
     else:
-        # For all other operators (like +, not, neg, etc.)
-        control.append(label)
         for child in children:
             _traverse(child, control)
+        control.append(label)  # Now using post-order
 

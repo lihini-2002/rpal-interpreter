@@ -28,7 +28,6 @@ def main():
 
     # Step 4: If -ast → print raw AST and exit
     if args.ast:
-        print("Original AST:")
         print_ast(ast_root)
         return
 
