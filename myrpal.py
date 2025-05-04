@@ -6,9 +6,8 @@ from src.standerizer.node import Node
 from src.standerizer import ast_factory
 from src.lcrs_to_nary_convertor import lcrs_to_nary
 from src.rpal_ast import print_ast
-from src.standerdizer import Standardizer
-from src.control_generator import generate_control, control_structures
-from src.cse_machine import evaluate
+from src.CSEM.cse_factory import CSEMachineFactory
+from src.CSEM.csemachine import CSEMachine
 
 def main():
     # Set up command-line argument parsing
@@ -50,6 +49,12 @@ def main():
         ast_obj.print_ast()
         return
 
+    cse_machine_factory = CSEMachineFactory()
+    cse_machine = cse_machine_factory.get_cse_machine(ast_obj)
+        
+    # Default action: print the final output
+    print("Output of the above program is:")
+    print(cse_machine.get_answer())
 
 
 if __name__ == "__main__":
