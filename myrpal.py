@@ -48,7 +48,7 @@ def main():
         ast_obj.print_ast()
         return
 
-    # Step 7: Convert n-ary tree back to LCRS
+    # Step 7: Convert n-ary tree back to LCRS(Now the standardized AST is in the lcrs format.Now an ADTNode object)
     st_lcrs_root = nary_to_lcrs(ast_obj.root)
     print_ast(st_lcrs_root)
 
