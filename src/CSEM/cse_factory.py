@@ -23,11 +23,11 @@ class CSEMachineFactory:
         else:
             # Normalize aliases: <ID:...> → <IDENTIFIER:...>, <INT:...> → <INTEGER:...>
             if data.startswith("<ID:"):
-                data = "<IDENTIFIER:" + data[4:]
+                data = "<IDENTIFIER:" + data[4:-1] + ">"
             elif data.startswith("<INT:"):
-                data = "<INTEGER:" + data[5:]
+                data = "<INTEGER:" + data[5:-1] + ">"
             elif data.startswith("<STR:"):
-                data = "<STRING:" + data[5:]
+                data = "<STRING:" + data[5:-1] + ">"
             elif data.startswith("<BOOL:t"):
                 data = "<BOOLEAN:true>"
             elif data.startswith("<BOOL:f"):
