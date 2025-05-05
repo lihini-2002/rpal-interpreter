@@ -6,8 +6,7 @@ from src.standerizer.node import Node
 from src.standerizer import ast_factory
 from src.lcrs_to_nary_convertor import lcrs_to_nary
 from src.rpal_ast import print_ast
-from src.CSEM.cse_factory import CSEMachineFactory
-from src.CSEM.csemachine import CSEMachine
+from src.nary_to_lcrs_convertor import nary_to_lcrs
 
 def main():
     # Set up command-line argument parsing
@@ -34,7 +33,7 @@ def main():
         print_ast(ast_root)
         return
 
-    # Step 5: Convert LCRS AST to senior-style n-ary tree
+    # Step 5: Convert LCRS AST to n-ary tree
     nary_root = lcrs_to_nary(ast_root)
 
     # Wrap in AST object
@@ -49,12 +48,9 @@ def main():
         ast_obj.print_ast()
         return
 
-    cse_machine_factory = CSEMachineFactory()
-    cse_machine = cse_machine_factory.get_cse_machine(ast_obj)
-        
-    # Default action: print the final output
-    print("Output of the above program is:")
-    print(cse_machine.get_answer())
+    # Step 7: Convert n-ary tree back to LCRS
+    st_lcrs_root = nary_to_lcrs(ast_obj.root)
+    print_ast(st_lcrs_root)
 
 
 if __name__ == "__main__":

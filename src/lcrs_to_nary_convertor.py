@@ -1,4 +1,4 @@
-# Converts your LCRS-based ASTNode to senior-style Node
+# Converts your LCRS-based ASTNode to Node
 from src.rpal_ast import ASTNode
 from src.standerizer.node import Node
 
