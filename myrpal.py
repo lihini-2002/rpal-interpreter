@@ -7,8 +7,7 @@ from src.standerizer import ast_factory
 from src.lcrs_to_nary_convertor import lcrs_to_nary
 from src.rpal_ast import print_ast
 from src.nary_to_lcrs_convertor import nary_to_lcrs
-from src.CSEM.csemachine import CSEMachine
-from src.CSEM.cse_factory import CSEMachineFactory
+from src.cse_machine.machine import CSEMachine
 
 def main():
     # Set up command-line argument parsing
@@ -53,12 +52,16 @@ def main():
     # Step 7: Convert n-ary tree back to LCRS(Now the standardized AST is in the lcrs format.Now an ADTNode object)
     st_lcrs_root = nary_to_lcrs(ast_obj.root)
     
-    cse_machine_factory = CSEMachineFactory()
-    cse_machine = cse_machine_factory.get_cse_machine(ast_obj)
+    # Convert back to n-ary tree for CSE machine
+    st_nary_root = lcrs_to_nary(st_lcrs_root)
+    
+    # Create and execute the CSE machine
+    cse_machine = CSEMachine()
+    cse_machine.execute(st_nary_root)
         
     # Default action: print the final output
     print("Output of the above program is:")
-    print(cse_machine.get_answer())
+    print(cse_machine._generate_output())
 
 
 if __name__ == "__main__":
