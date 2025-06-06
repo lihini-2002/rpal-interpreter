@@ -45,7 +45,7 @@ def main():
 
     # If -st → print standardized AST and exit
     if args.st:
-        print("Standardized AST:")
+        # print("Standardized AST:")
         ast_obj.print_ast()
         return
 
