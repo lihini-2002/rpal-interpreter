@@ -234,7 +234,7 @@ class CSEMachine:
         """
 
         # for avoiding infinite loop 
-        if self.current_enviroment.index >= 2000:
+        if self.current_enviroment.index >= 10000:
             self._error_handler.handle_error("CSE : Environment limit exceeded")
             return
 
