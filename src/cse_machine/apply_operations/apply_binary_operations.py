@@ -7,7 +7,7 @@
 # This module can be imported and used to apply binary operations to operands in the CSE machine.
 
 # This file contains functions to apply unary and binary operations to operands in the CSE machine.
-from src.utils.control_structure_element import ControlStructureElement
+from src.cse_machine.utils.control_structure_element import ControlStructureElement
 
 def apply_binary(cse_machine, rator, rand, binop):
     """

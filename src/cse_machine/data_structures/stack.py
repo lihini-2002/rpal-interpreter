@@ -6,7 +6,7 @@
 # Usage
 # This module can be imported and used to create a custom stack class for the CSE machine.
 
-from src.utils.stack import Stack
+from src.cse_machine.utils.stack import Stack
 from src.cse_machine.data_structures.enviroment import Environment
 
 class STACK(Stack):

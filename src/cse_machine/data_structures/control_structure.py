@@ -7,7 +7,7 @@
 # This module contains the ControlStructure class, which represents a control structure in the CSE machine.
 
 
-from src.utils.stack import Stack
+from src.cse_machine.utils.stack import Stack
 
 class ControlStructure(Stack):
     """

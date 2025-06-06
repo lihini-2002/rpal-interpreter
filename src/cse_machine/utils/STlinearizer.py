@@ -8,7 +8,7 @@
 
 
 from src.cse_machine.data_structures.control_structure import ControlStructure
-from src.utils.control_structure_element import ControlStructureElement
+from src.cse_machine.utils.control_structure_element import ControlStructureElement
 
 
 class Linearizer:
