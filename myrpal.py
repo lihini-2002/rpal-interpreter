@@ -60,7 +60,7 @@ def main():
     cse_machine.execute(st_nary_root)
         
     # Default action: print the final output
-    print("Output of the above program is:")
+    # print("Output of the above program is:")
     print(cse_machine._generate_output())
 
 
