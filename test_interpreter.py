@@ -6,7 +6,7 @@ from pathlib import Path
 def run_rpal_exe(file_path):
     """Run the test file using rpal.exe"""
     try:
-        result = subprocess.run(['rpal-wine/rpal.exe', str(file_path)], 
+        result = subprocess.run(['original-interpreter/rpal.exe', str(file_path)], 
                               capture_output=True, 
                               text=True, 
                               check=True)
