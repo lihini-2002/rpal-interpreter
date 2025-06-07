@@ -53,14 +53,14 @@ def main():
         return
 
     # Convert standardized AST back to LCRS format
-    st_lcrs_root = nary_to_lcrs(ast_obj.root)
+    # st_lcrs_root = nary_to_lcrs(ast_obj.root)
     
     # Convert to n-ary format for CSE machine execution
-    st_nary_root = lcrs_to_nary(st_lcrs_root)
+    # st_nary_root = lcrs_to_nary(st_lcrs_root)
     
     # Execute the program using CSE machine
     cse_machine = CSEMachine()
-    cse_machine.execute(st_nary_root)
+    cse_machine.execute(ast_obj.root)
     
     # Print the program output
     print(cse_machine._generate_output())

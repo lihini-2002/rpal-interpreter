@@ -22,16 +22,45 @@ A Python implementation of an interpreter for the RPAL (Recursive Programming Al
 
 ```
 .
-├── src/                    # Source code directory
-│   ├── lexer.py           # Lexical analyzer
-│   ├── parser.py          # Parser implementation
-│   ├── standerizer/       # AST standardization
-│   ├── cse_machine/       # CSE machine implementation
-│   └── ...
-├── test-programs/         # Sample RPAL programs
-├── tests/                 # Test suite
-├── myrpal.py             # Main interpreter script
-└── Makefile              # Build and test automation
+├── src/                                # Source code directory
+│   ├── lexer.py                       # Lexical analyzer
+│   ├── parser.py                      # Parser implementation
+│   ├── utils.py                       # Utility functions
+│   ├── rpal_ast.py                    # AST node definitions
+│   ├── nary_to_lcrs_convertor.py      # N-ary to LCRS tree conversion
+│   ├── lcrs_to_nary_convertor.py      # LCRS to N-ary tree conversion
+│   ├── __init__.py
+│   ├── standerizer/                   # AST standardization
+│   │   ├── node.py                    # AST node implementations
+│   │   ├── ast.py                     # AST standardization logic
+│   │   └── ast_factory.py            # Factory for creating AST nodes
+│   └── cse_machine/                   # CSE machine implementation
+│       ├── machine.py                 # Main CSE machine implementation
+│       ├── error_handler.py           # Error handling utilities
+│       ├── cse_error_handler.py       # CSE-specific error handling
+│       ├── __init__.py
+│       ├── apply_operations/          # Operation implementations
+│       │   ├── apply_binary_operations.py
+│       │   ├── apply_unary_operations.py
+│       │   └── __init__.py
+│       ├── utils/                     # Utility functions
+│       │   ├── tokens.py              # Token definitions
+│       │   ├── util.py                # General utilities
+│       │   ├── control_structure_element.py
+│       │   ├── stack.py               # Stack implementation
+│       │   ├── STlinearizer.py        # Standard tree linearizer
+│       │   └── __init__.py
+│       └── data_structures/           # Data structure implementations
+│           ├── stack.py               # Stack data structure
+│           ├── enviroment.py          # Environment management
+│           ├── control_structure.py   # Control structure implementation
+│           └── __init__.py
+├── test-programs/                     # Sample RPAL programs for testing
+├── tests/                             # Test suite
+├── myrpal.py                          # Main interpreter script
+├── test_interpreter.py                # Interpreter tests
+├── Makefile                           # Build and test automation
+└── .gitignore                         # Git ignore file
 ```
 
 ## Requirements
