@@ -1,5 +1,3 @@
-# src/cse_machine/data_structures/stack.py
-
 # Description
 # This module defines a custom stack class for the CSE (Compiler, Symbolic, Expression) machine.
 

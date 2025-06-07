@@ -1,5 +1,6 @@
-
 class Node:
+    """Represents a node in the Abstract Syntax Tree with data, depth, parent-child relationships, and standardization status."""
+    
     def __init__(self):
         self.data = None
         self.depth = 0
@@ -7,6 +8,7 @@ class Node:
         self.children = []
         self.is_standardized = False
 
+    # Basic getters and setters
     def set_data(self, data):
         self.data = data
 
@@ -14,6 +16,7 @@ class Node:
         return self.data
 
     def get_degree(self):
+        """Returns the number of children of this node."""
         return len(self.children)
     
     def get_children(self):
@@ -32,18 +35,20 @@ class Node:
         return self.parent
 
     def standardize(self):
+        """
+        Standardizes the AST node according to RPAL standardization rules.
+        Applies different transformations based on node type (let, where, function_form, etc.).
+        Each transformation converts the node into a standardized form using gamma and lambda nodes.
+        """
         if not self.is_standardized:
+            # First standardize all children
             for child in self.children:
                 child.standardize()
 
+            # Apply standardization rules based on node type
             if self.data == "let":
-                # Standardize LET node
-                #       LET              GAMMA
-                #     /     \           /     \
-                #    EQUAL   P   ->   LAMBDA   E
-                #   /   \             /    \
-                #  X     E           X      P 
-                
+                # LET -> GAMMA transformation
+                # Converts: LET(EQUAL(X,E), P) -> GAMMA(LAMBDA(X,P), E)
                 temp1 = self.children[0].children[1]
                 temp1.set_parent(self)
                 temp1.set_depth(self.depth + 1)
@@ -54,25 +59,19 @@ class Node:
                 self.children[0].set_data("lambda")
                 self.children[0].children[1] = temp2
                 self.set_data("gamma")
+
             elif self.data == "where":
-                #       WHERE               LET
-                #       /   \             /     \
-                #      P    EQUAL   ->  EQUAL   P
-                #           /   \       /   \
-                #          X     E     X     E
-                
+                # WHERE -> LET transformation
+                # Converts: WHERE(P, EQUAL(X,E)) -> LET(EQUAL(X,E), P)
                 temp = self.children[0]
                 self.children[0] = self.children[1]
                 self.children[1] = temp
                 self.set_data("let")
                 self.standardize()
+
             elif self.data == "function_form":
-                
-                #       FCN_FORM                EQUAL
-                #       /   |   \              /    \
-                #      P    V+   E    ->      P     +LAMBDA
-                #                                    /     \
-                #                                    V     .E
+                # FCN_FORM -> EQUAL transformation
+                # Converts: FCN_FORM(P,V+,E) -> EQUAL(P,LAMBDA(V+,E))
                 Ex = self.children[-1]
                 current_lambda = NodeFactory.get_node_with_parent("lambda", self.depth + 1, self, [], True)
                 self.children.insert(1, current_lambda)
@@ -92,12 +91,10 @@ class Node:
                 current_lambda.children.append(Ex)
                 self.children.pop(2)
                 self.set_data("=")
+
             elif self.data == "lambda":
-                
-                #     LAMBDA        LAMBDA
-                #      /   \   ->   /    \
-                #     V++   E      V     .E
-                
+                # LAMBDA transformation
+                # Converts: LAMBDA(V++,E) -> LAMBDA(V,LAMBDA(...))
                 if len(self.children) > 2:
                     Ey = self.children[-1]
                     current_lambda = NodeFactory.get_node_with_parent("lambda", self.depth + 1, self, [], True)
@@ -117,16 +114,10 @@ class Node:
 
                     current_lambda.children.append(Ey)
                     self.children.pop(2)
+
             elif self.data == "within":
-                
-                #           WITHIN                  EQUAL
-                #          /      \                /     \
-                #        EQUAL   EQUAL    ->      X2     GAMMA
-                #       /    \   /    \                  /    \
-                #      X1    E1 X2    E2               LAMBDA  E1
-                #                                      /    \
-                #                                     X1    E2
-                
+                # WITHIN -> EQUAL transformation
+                # Converts: WITHIN(EQUAL(X1,E1), EQUAL(X2,E2)) -> EQUAL(X2,GAMMA(LAMBDA(X1,E2),E1))
                 X1 = self.children[0].children[0]
                 X2 = self.children[1].children[0]
                 E1 = self.children[0].children[1]
@@ -149,14 +140,10 @@ class Node:
                 self.children.append(X2)
                 self.children.append(gamma)
                 self.set_data("=")
+
             elif self.data == "@":
-                
-                #         AT              GAMMA
-                #       / | \    ->       /    \
-                #      E1 N E2          GAMMA   E2
-                #                       /    \
-                #                      N     E1
-                
+                # AT -> GAMMA transformation
+                # Converts: @(E1,N,E2) -> GAMMA(GAMMA(N,E1),E2)
                 gamma1 = NodeFactory.get_node_with_parent("gamma", self.depth + 1, self, [], True)
                 e1 = self.children[0]
                 e1.set_depth(e1.get_depth() + 1)
@@ -170,14 +157,10 @@ class Node:
                 self.children.pop(0)
                 self.children.insert(0, gamma1)
                 self.set_data("gamma")
+
             elif self.data == "and":
-                
-                #         SIMULTDEF            EQUAL
-                #             |               /     \
-                #           EQUAL++  ->     COMMA   TAU
-                #           /   \             |      |
-                #          X     E           X++    E++
-                
+                # AND -> EQUAL transformation
+                # Converts: AND(EQUAL++) -> EQUAL(COMMA(X++), TAU(E++))
                 comma = NodeFactory.get_node_with_parent(",", self.depth + 1, self, [], True)
                 tau = NodeFactory.get_node_with_parent("tau", self.depth + 1, self, [], True)
 
@@ -191,16 +174,10 @@ class Node:
                 self.children.append(comma)
                 self.children.append(tau)
                 self.set_data("=")
+
             elif self.data == "rec":
-                
-                #        REC                 EQUAL
-                #         |                 /     \
-                #       EQUAL     ->       X     GAMMA
-                #      /     \                   /    \
-                #     X       E                YSTAR  LAMBDA
-                #                                     /     \
-                #                                     X      E
-                
+                # REC -> EQUAL transformation
+                # Converts: REC(EQUAL(X,E)) -> EQUAL(X,GAMMA(YSTAR,LAMBDA(X,E)))
                 X = self.children[0].children[0]
                 E = self.children[0].children[1]
                 F = NodeFactory.get_node_with_parent(X.get_data(), self.depth + 1, self, X.children, True)
@@ -223,12 +200,16 @@ class Node:
 
             self.is_standardized = True
 
+
 class NodeFactory:
+    """Factory class for creating Node instances with different configurations."""
+    
     def __init__(self):
         pass
 
     @staticmethod
     def get_node(data, depth):
+        """Creates a basic node with given data and depth."""
         node = Node()
         node.set_data(data)
         node.set_depth(depth)
@@ -237,6 +218,7 @@ class NodeFactory:
 
     @staticmethod
     def get_node_with_parent(data, depth, parent, children, is_standardized):
+        """Creates a node with complete configuration including parent, children, and standardization status."""
         node = Node()
         node.set_data(data)
         node.set_depth(depth)

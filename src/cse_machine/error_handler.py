@@ -1,5 +1,3 @@
-# src/error_handling/error_handler.py
-
 # This is the main module for error handling. It provides a class ErrorHandler with static methods for handling errors.
 class ErrorHandler:
     """

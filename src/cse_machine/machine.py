@@ -1,4 +1,3 @@
-# src/cse_machine/machine.py
 
 """
 Control Structure Environment (CSE) Machine for Executing RPAL Programs.

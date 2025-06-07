@@ -60,12 +60,12 @@ python myrpal.py program.rpal
 
 2. Print the original AST:
 ```bash
-python myrpal.py -ast program.rpal
+python myrpal.py program.rpal -ast
 ```
 
 3. Print the standardized AST:
 ```bash
-python myrpal.py -st program.rpal
+python myrpal.py program.rpal -st
 ```
 
 ## Example Programs

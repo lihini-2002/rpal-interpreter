@@ -1,5 +1,3 @@
-#src/cse_machine/binary_operations/apply_un.py
-
 # Description
 # This module defines functions to apply uninary operations to operands in the CSE (Compiler, Symbolic, Expression) machine.
 

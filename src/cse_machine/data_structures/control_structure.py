@@ -1,5 +1,3 @@
-#src/cse_machine/data_structures/control_structure.py
-
 # Description
 # This module defines a control structure class for the CSE (Compiler, Symbolic, Expression) machine.
 

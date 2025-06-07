@@ -1,5 +1,3 @@
-# src/cse_machine/data_structures/enumeration.py
-
 # Description
 # This module defines an enumeration class for the CSE (Compiler, Symbolic, Expression) machine. 
 # The enumeration class is used to represent different types of data and operations within the machine.

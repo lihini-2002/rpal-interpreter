@@ -1,5 +1,3 @@
-#src/cse_machine/binary_operations/apply_bin.py
-
 # Description
 # This module defines functions to apply binary operations to operands in the CSE (Compiler, Symbolic, Expression) machine.
 
