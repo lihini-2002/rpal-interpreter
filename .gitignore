@@ -16,5 +16,4 @@ venv/
 
 # PDF or output files
 *.out
-*.exe
 *.zip
